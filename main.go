@@ -3,21 +3,16 @@ package main
 import (
 	"log"
 
-	"github.com/louisevanderlith/mango/api/comment/routers"
-	_ "github.com/louisevanderlith/mango/core/comment"
-	"github.com/louisevanderlith/mango/pkg"
-	"github.com/louisevanderlith/mango/pkg/enums"
+	"github.com/louisevanderlith/comment/routers"
+	_ "github.com/louisevanderlith/comment/core"
+	"github.com/louisevanderlith/mango"
+	"github.com/louisevanderlith/mango/enums"
 
 	"github.com/astaxie/beego"
 )
 
 func main() {
 	mode := beego.BConfig.RunMode
-
-	if beego.BConfig.RunMode == "dev" {
-		beego.BConfig.WebConfig.DirectoryIndex = true
-		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-	}
 
 	// Register with router
 	name := beego.BConfig.AppName
