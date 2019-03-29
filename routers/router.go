@@ -8,30 +8,24 @@
 package routers
 
 import (
-	"github.com/louisevanderlith/mango/api/comment/controllers"
-	"github.com/louisevanderlith/mango/pkg"
-	"github.com/louisevanderlith/mango/pkg/control"
-	"github.com/louisevanderlith/mango/pkg/enums"
+	"github.com/louisevanderlith/comment/controllers"
+	"github.com/louisevanderlith/mango"
+	"github.com/louisevanderlith/mango/control"
+	"github.com/louisevanderlith/mango/enums"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 )
 
-func Setup(service *util.Service) {
+func Setup(service *mango.Service) {
 	ctrlmap := EnableFilters(service)
 
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/message",
-			beego.NSInclude(
-				controllers.NewMessageCtrl(ctrlmap),
-			),
-		),
-	)
-
-	beego.AddNamespace(ns)
+	msgCtrl := controllers.NewMessageCtrl(ctrlmap)
+	beego.Router("v1/message", msgCtrl, "put:Put;post:Post")
+	beego.Router("v1/message/:type/:nodeID", msgCtrl, "get:Get")
 }
 
-func EnableFilters(s *util.Service) *control.ControllerMap {
+func EnableFilters(s *mango.Service) *control.ControllerMap {
 	ctrlmap := control.CreateControlMap(s)
 
 	emptyMap := make(control.ActionMap)

@@ -1,4 +1,4 @@
-package comment
+package core
 
 import (
 	"github.com/louisevanderlith/husk"

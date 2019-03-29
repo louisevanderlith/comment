@@ -1,12 +1,12 @@
-package comment
+package core
 
 import (
 	"github.com/louisevanderlith/husk"
 )
 
 type Message struct {
-	UserKey     *husk.Key
-	ItemKey     *husk.Key
+	UserKey     husk.Key
+	ItemKey     husk.Key
 	UpVotes     int64
 	DownVotes   int64
 	Text        string `hsk:"size(512)"`
@@ -26,11 +26,11 @@ func SubmitMessage(msg Message) husk.CreateSet {
 	return ctx.Messages.Create(msg)
 }
 
-func GetMessage(itemKey *husk.Key, commentType CommentType) (husk.Recorder, error) {
+func GetMessage(itemKey husk.Key, commentType CommentType) (husk.Recorder, error) {
 	return ctx.Messages.FindFirst(byItemKeyCommentType(itemKey, commentType))
 }
 
-func UpdateMessage(key *husk.Key, data Message) error {
+func UpdateMessage(key husk.Key, data Message) error {
 	rec, err := ctx.Messages.FindByKey(key)
 
 	if err != nil {
