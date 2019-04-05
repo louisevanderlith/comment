@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
+	"os"
 
+	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/routers"
-	_ "github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/mango"
 	"github.com/louisevanderlith/mango/enums"
 
@@ -13,6 +14,9 @@ import (
 
 func main() {
 	mode := os.Getenv("RUNMODE")
+
+	core.CreateContext()
+	defer core.Shutdown()
 
 	// Register with router
 	name := beego.BConfig.AppName

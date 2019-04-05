@@ -10,8 +10,12 @@ type context struct {
 
 var ctx context
 
-func init() {
+func CreateContext() {
 	ctx = context{
 		Messages: husk.NewTable(new(Message)),
 	}
+}
+
+func Shutdown() {
+	ctx.Messages.Save()
 }
