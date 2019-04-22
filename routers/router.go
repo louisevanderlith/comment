@@ -8,13 +8,13 @@
 package routers
 
 import (
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/plugins/cors"
 	"github.com/louisevanderlith/comment/controllers"
 	"github.com/louisevanderlith/mango"
 	"github.com/louisevanderlith/mango/control"
-	"github.com/louisevanderlith/mango/enums"
-
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/plugins/cors"
+	secure "github.com/louisevanderlith/secure/core"
+	"github.com/louisevanderlith/secure/core/roletype"
 )
 
 func Setup(service *mango.Service) {
@@ -28,9 +28,9 @@ func Setup(service *mango.Service) {
 func EnableFilters(s *mango.Service) *control.ControllerMap {
 	ctrlmap := control.CreateControlMap(s)
 
-	emptyMap := make(control.ActionMap)
-	emptyMap["POST"] = enums.User
-	emptyMap["PUT"] = enums.User
+	emptyMap := make(secure.ActionMap)
+	emptyMap["POST"] = roletype.User
+	emptyMap["PUT"] = roletype.User
 
 	ctrlmap.Add("/message", emptyMap)
 

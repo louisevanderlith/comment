@@ -3,10 +3,10 @@ package controllers
 import (
 	"encoding/json"
 
+	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/husk"
-	"github.com/louisevanderlith/mango/core/comment"
 
-	"github.com/louisevanderlith/mango/pkg/control"
+	"github.com/louisevanderlith/mango/control"
 )
 
 type MessageController struct {
@@ -28,10 +28,15 @@ func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
 // @Failure 403 body is empty
 // @router /:type/:nodeID[get]
 func (req *MessageController) Get() {
-	commentType := comment.GetCommentType(req.Ctx.Input.Param(":type"))
-	nodeKey := husk.ParseKey(req.Ctx.Input.Param(":nodeID"))
+	commentType := core.GetCommentType(req.Ctx.Input.Param(":type"))
+	nodeKey, err := husk.ParseKey(req.Ctx.Input.Param(":nodeID"))
 
-	result, err := comment.GetMessage(nodeKey, commentType)
+	if err != nil {
+		req.Serve(nil, err)
+		return
+	}
+
+	result, err := core.GetMessage(nodeKey, commentType)
 
 	req.Serve(result, err)
 }
@@ -43,7 +48,7 @@ func (req *MessageController) Get() {
 // @Failure 403 body is empty
 // @router / [post]
 func (req *MessageController) Post() {
-	var entry comment.Message
+	var entry core.Message
 	err := json.Unmarshal(req.Ctx.Input.RequestBody, &entry)
 
 	if err != nil {
@@ -51,7 +56,7 @@ func (req *MessageController) Post() {
 		return
 	}
 
-	rec := comment.SubmitMessage(entry)
+	rec := core.SubmitMessage(entry)
 
 	req.Serve(rec, nil)
 }
@@ -63,14 +68,15 @@ func (req *MessageController) Post() {
 // @Failure 403 body is empty
 // @router / [put]
 func (req *MessageController) Put() {
-	entry, err := req.GetKeyedRequest()
+	body := core.Message{}
+	key, err := req.GetKeyedRequest(&body)
 
 	if err != nil {
 		req.Serve(nil, err)
 		return
 	}
 
-	err = comment.UpdateMessage(entry.Key, entry.Body.(comment.Message))
+	err = core.UpdateMessage(key, body)
 
 	req.Serve(nil, err)
 }
