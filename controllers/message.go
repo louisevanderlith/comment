@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/husk"
@@ -32,13 +33,18 @@ func (req *MessageController) Get() {
 	nodeKey, err := husk.ParseKey(req.Ctx.Input.Param(":nodeID"))
 
 	if err != nil {
-		req.Serve(nil, err)
+		req.Serve(http.StatusBadRequest, err, nil)
 		return
 	}
 
 	result, err := core.GetMessage(nodeKey, commentType)
 
-	req.Serve(result, err)
+	if err != nil {
+		req.Serve(http.StatusNotFound, err, nil)
+		return
+	}
+
+	req.Serve(http.StatusOK, nil, result)
 }
 
 // @Title CreateMessage
@@ -52,13 +58,18 @@ func (req *MessageController) Post() {
 	err := json.Unmarshal(req.Ctx.Input.RequestBody, &entry)
 
 	if err != nil {
-		req.Serve(nil, err)
+		req.Serve(http.StatusBadRequest, err, nil)
 		return
 	}
 
 	rec := core.SubmitMessage(entry)
 
-	req.Serve(rec, nil)
+	if err != nil {
+		req.Serve(http.StatusNotFound, err, nil)
+		return
+	}
+
+	req.Serve(http.StatusOK, nil, rec)
 }
 
 // @Title CreateMessage
@@ -72,11 +83,16 @@ func (req *MessageController) Put() {
 	key, err := req.GetKeyedRequest(&body)
 
 	if err != nil {
-		req.Serve(nil, err)
+		req.Serve(http.StatusBadRequest, err, nil)
 		return
 	}
 
 	err = core.UpdateMessage(key, body)
 
-	req.Serve(nil, err)
+	if err != nil {
+		req.Serve(http.StatusNotFound, err, nil)
+		return
+	}
+
+	req.Serve(http.StatusOK, nil, "Saved")
 }
