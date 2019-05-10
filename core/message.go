@@ -23,6 +23,8 @@ func SubmitMessage(msg Message) husk.CreateSet {
 	msg.UpVotes = 0
 	msg.DownVotes = 0
 
+	defer ctx.Messages.Save()
+
 	return ctx.Messages.Create(msg)
 }
 
@@ -42,6 +44,8 @@ func UpdateMessage(key husk.Key, data Message) error {
 	if err != nil {
 		return err
 	}
+
+	defer ctx.Messages.Save()
 
 	return ctx.Messages.Update(rec)
 }
