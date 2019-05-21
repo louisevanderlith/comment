@@ -1,5 +1,6 @@
 # comment
 Mango API: Comment
+Any comments made on the system, should all be controlled by the Comment API.
 
 ## Run with Docker
 * $ docker build -t avosa/comment:dev .
