@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path"
 
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/routers"
@@ -31,7 +32,7 @@ func main() {
 	if err != nil {
 		log.Print("Register: ", err)
 	} else {
-		routers.Setup(srv)
+		routers.Setup(srv, host)
 		beego.Run()
 	}
 }
