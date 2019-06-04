@@ -10,7 +10,7 @@ type Message struct {
 	UpVotes     int64
 	DownVotes   int64
 	Text        string `hsk:"size(512)"`
-	CommentType CommentType
+	CommentType CommentType //make a string
 	Voters      map[husk.Key]struct{}
 	Children    []Message
 }
