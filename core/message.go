@@ -32,6 +32,10 @@ func GetMessage(itemKey husk.Key, commentType CommentType) (husk.Recorder, error
 	return ctx.Messages.FindFirst(byItemKeyCommentType(itemKey, commentType))
 }
 
+func GetAllMessages(page, size int) husk.Collection {
+	return ctx.Messages.Find(page, size, husk.Everything())
+}
+
 func UpdateMessage(key husk.Key, data Message) error {
 	rec, err := ctx.Messages.FindByKey(key)
 

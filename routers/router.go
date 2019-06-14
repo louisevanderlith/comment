@@ -17,8 +17,9 @@ func Setup(s *mango.Service, host string) {
 	ctrlmap := EnableFilters(s, host)
 
 	msgCtrl := controllers.NewMessageCtrl(ctrlmap)
-	beego.Router("v1/message", msgCtrl, "put:Put;post:Post")
-	beego.Router("v1/message/:type/:nodeID", msgCtrl, "get:Get")
+	beego.Router("/v1/message", msgCtrl, "put:Put;post:Post")
+	beego.Router("/v1/message/all/:pagesize", msgCtrl, "get:GetAll")
+	beego.Router("/v1/message/:type/:nodeID", msgCtrl, "get:Get")
 }
 
 func EnableFilters(s *mango.Service, host string) *control.ControllerMap {
@@ -28,7 +29,12 @@ func EnableFilters(s *mango.Service, host string) *control.ControllerMap {
 	emptyMap["POST"] = roletype.User
 	emptyMap["PUT"] = roletype.User
 
-	ctrlmap.Add("/message", emptyMap)
+	ctrlmap.Add("/v1/message", emptyMap)
+
+	adminMap := make(secure.ActionMap)
+	adminMap["GET"] = roletype.Admin
+
+	ctrlmap.Add("/v1/message/all", adminMap)
 
 	beego.InsertFilter("/*", beego.BeforeRouter, ctrlmap.FilterAPI, false)
 	allowed := fmt.Sprintf("https://*%s", strings.TrimSuffix(host, "/"))
