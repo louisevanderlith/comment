@@ -10,7 +10,7 @@ type Message struct {
 	UpVotes     int64
 	DownVotes   int64
 	Text        string `hsk:"size(512)"`
-	CommentType CommentType
+	CommentType CommentType //make a string
 	Voters      map[husk.Key]struct{}
 	Children    []Message
 }
@@ -30,6 +30,10 @@ func SubmitMessage(msg Message) husk.CreateSet {
 
 func GetMessage(itemKey husk.Key, commentType CommentType) (husk.Recorder, error) {
 	return ctx.Messages.FindFirst(byItemKeyCommentType(itemKey, commentType))
+}
+
+func GetAllMessages(page, size int) husk.Collection {
+	return ctx.Messages.Find(page, size, husk.Everything())
 }
 
 func UpdateMessage(key husk.Key, data Message) error {

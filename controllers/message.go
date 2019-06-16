@@ -21,6 +21,14 @@ func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
 	return result
 }
 
+// @router /all/:pagesize [get]
+func (req *MessageController) GetAll() {
+	page, size := req.GetPageData()
+	results := core.GetAllMessages(page, size)
+
+	req.Serve(http.StatusOK, nil, results)
+}
+
 // @Title GetMessages
 // @Description Gets all comments related to a node.
 // @Param	typeID			path 	string 	true		"comment's type"
