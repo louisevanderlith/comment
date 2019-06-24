@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
+	"github.com/louisevanderlith/comment/core/commenttype"
 	"github.com/louisevanderlith/husk"
 
 	"github.com/louisevanderlith/mango/control"
@@ -35,9 +36,9 @@ func (req *MessageController) GetAll() {
 // @Param	nodeID			path	string 	true		"node's ID"
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
-// @router /:type/:nodeID[get]
+// @router /:type/:nodeID [get]
 func (req *MessageController) Get() {
-	commentType := core.GetCommentType(req.Ctx.Input.Param(":type"))
+	commentType := commenttype.GetEnum(req.Ctx.Input.Param(":type"))
 	nodeKey, err := husk.ParseKey(req.Ctx.Input.Param(":nodeID"))
 
 	if err != nil {
@@ -72,12 +73,12 @@ func (req *MessageController) Post() {
 
 	rec := core.SubmitMessage(entry)
 
-	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
+	if rec.Error != nil {
+		req.Serve(http.StatusInternalServerError, rec.Error, nil)
 		return
 	}
 
-	req.Serve(http.StatusOK, nil, rec)
+	req.Serve(http.StatusOK, nil, rec.Record)
 }
 
 // @Title CreateMessage
@@ -98,7 +99,7 @@ func (req *MessageController) Put() {
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
+		req.Serve(http.StatusInternalServerError, err, nil)
 		return
 	}
 

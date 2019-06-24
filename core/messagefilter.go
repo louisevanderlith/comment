@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/louisevanderlith/comment/core/commenttype"
 	"github.com/louisevanderlith/husk"
 )
 
@@ -10,8 +11,9 @@ func (f messageFilter) Filter(obj husk.Dataer) bool {
 	return f(obj.(*Message))
 }
 
-func byItemKeyCommentType(itemKey husk.Key, commentType CommentType) messageFilter {
+func byItemKeyCommentType(itemKey husk.Key, commentType commenttype.Enum) messageFilter {
+	typeStr := commentType.String()
 	return func(obj *Message) bool {
-		return obj.ItemKey == itemKey && obj.CommentType == commentType
+		return obj.ItemKey == itemKey && obj.CommentType == typeStr
 	}
 }
