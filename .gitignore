@@ -13,4 +13,5 @@
 
 comment
 
-db/
+db/*.husk
+!db/*.seed.json

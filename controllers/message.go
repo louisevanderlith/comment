@@ -1,25 +1,16 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/core/commenttype"
+	"github.com/louisevanderlith/droxolite/xontrols"
 	"github.com/louisevanderlith/husk"
-
-	"github.com/louisevanderlith/mango/control"
 )
 
 type MessageController struct {
-	control.APIController
-}
-
-func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
-	result := &MessageController{}
-	result.SetInstanceMap(ctrlMap)
-
-	return result
+	xontrols.APICtrl
 }
 
 // @router /all/:pagesize [get]
@@ -38,8 +29,8 @@ func (req *MessageController) GetAll() {
 // @Failure 403 body is empty
 // @router /:type/:nodeID [get]
 func (req *MessageController) Get() {
-	commentType := commenttype.GetEnum(req.Ctx.Input.Param(":type"))
-	nodeKey, err := husk.ParseKey(req.Ctx.Input.Param(":nodeID"))
+	commentType := commenttype.GetEnum(req.FindParam("type"))
+	nodeKey, err := husk.ParseKey(req.FindParam("nodeID"))
 
 	if err != nil {
 		req.Serve(http.StatusBadRequest, err, nil)
@@ -64,7 +55,7 @@ func (req *MessageController) Get() {
 // @router / [post]
 func (req *MessageController) Post() {
 	var entry core.Message
-	err := json.Unmarshal(req.Ctx.Input.RequestBody, &entry)
+	err := req.Body(&entry)
 
 	if err != nil {
 		req.Serve(http.StatusBadRequest, err, nil)
