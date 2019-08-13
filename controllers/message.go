@@ -1,24 +1,24 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
+	"github.com/louisevanderlith/comment/core/commenttype"
+	"github.com/louisevanderlith/droxolite/xontrols"
 	"github.com/louisevanderlith/husk"
-
-	"github.com/louisevanderlith/mango/control"
 )
 
 type MessageController struct {
-	control.APIController
+	xontrols.APICtrl
 }
 
-func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
-	result := &MessageController{}
-	result.SetInstanceMap(ctrlMap)
+// @router /all/:pagesize [get]
+func (req *MessageController) GetAll() {
+	page, size := req.GetPageData()
+	results := core.GetAllMessages(page, size)
 
-	return result
+	req.Serve(http.StatusOK, nil, results)
 }
 
 // @Title GetMessages
@@ -27,10 +27,10 @@ func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
 // @Param	nodeID			path	string 	true		"node's ID"
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
-// @router /:type/:nodeID[get]
+// @router /:type/:nodeID [get]
 func (req *MessageController) Get() {
-	commentType := core.GetCommentType(req.Ctx.Input.Param(":type"))
-	nodeKey, err := husk.ParseKey(req.Ctx.Input.Param(":nodeID"))
+	commentType := commenttype.GetEnum(req.FindParam("type"))
+	nodeKey, err := husk.ParseKey(req.FindParam("nodeID"))
 
 	if err != nil {
 		req.Serve(http.StatusBadRequest, err, nil)
@@ -55,7 +55,7 @@ func (req *MessageController) Get() {
 // @router / [post]
 func (req *MessageController) Post() {
 	var entry core.Message
-	err := json.Unmarshal(req.Ctx.Input.RequestBody, &entry)
+	err := req.Body(&entry)
 
 	if err != nil {
 		req.Serve(http.StatusBadRequest, err, nil)
@@ -64,12 +64,12 @@ func (req *MessageController) Post() {
 
 	rec := core.SubmitMessage(entry)
 
-	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
+	if rec.Error != nil {
+		req.Serve(http.StatusInternalServerError, rec.Error, nil)
 		return
 	}
 
-	req.Serve(http.StatusOK, nil, rec)
+	req.Serve(http.StatusOK, nil, rec.Record)
 }
 
 // @Title CreateMessage
@@ -90,7 +90,7 @@ func (req *MessageController) Put() {
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
+		req.Serve(http.StatusInternalServerError, err, nil)
 		return
 	}
 
