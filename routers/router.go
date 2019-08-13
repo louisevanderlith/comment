@@ -10,10 +10,10 @@ func Setup(poxy *droxolite.Epoxy) {
 	//Message
 	msgCtrl := &controllers.MessageController{}
 	msgGroup := droxolite.NewRouteGroup("message", msgCtrl)
-	msgGroup.AddRoute("/", "POST", roletype.User, msgCtrl.Post)
-	msgGroup.AddRoute("/", "PUT", roletype.User, msgCtrl.Put)
-	msgGroup.AddRoute("/all/{pagesize:[A-Z][0-9]+}", "GET", roletype.Admin, msgCtrl.GetAll)
-	msgGroup.AddRoute("/{type}/{nodeID:[0-9]+\x60[0-9]+}", "GET", roletype.Unknown, msgCtrl.Get)
+	msgGroup.AddRoute("Create Message", "/", "POST", roletype.User, msgCtrl.Post)
+	msgGroup.AddRoute("Update Message", "/", "PUT", roletype.User, msgCtrl.Put)
+	msgGroup.AddRoute("All Messges", "/all/{pagesize:[A-Z][0-9]+}", "GET", roletype.Admin, msgCtrl.GetAll)
+	msgGroup.AddRoute("Get Comments for Item", "/{type}/{nodeID:[0-9]+\x60[0-9]+}", "GET", roletype.Unknown, msgCtrl.Get)
 	poxy.AddGroup(msgGroup)
 
 	/*ctrlmap := EnableFilters(s, host)
