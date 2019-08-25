@@ -5,20 +5,19 @@ import (
 
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/core/commenttype"
-	"github.com/louisevanderlith/droxolite/xontrols"
+	"github.com/louisevanderlith/droxolite/context"
 	"github.com/louisevanderlith/husk"
 )
 
-type MessageController struct {
-	xontrols.APICtrl
+type Messages struct {
 }
 
 // @router /all/:pagesize [get]
-func (req *MessageController) GetAll() {
-	page, size := req.GetPageData()
+func (req *Messages) GetAll(ctx context.Contexer) (int, interface{}) {
+	page, size := ctx.GetPageData()
 	results := core.GetAllMessages(page, size)
 
-	req.Serve(http.StatusOK, nil, results)
+	return http.StatusOK, results
 }
 
 // @Title GetMessages
@@ -28,23 +27,21 @@ func (req *MessageController) GetAll() {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router /:type/:nodeID [get]
-func (req *MessageController) Get() {
-	commentType := commenttype.GetEnum(req.FindParam("type"))
-	nodeKey, err := husk.ParseKey(req.FindParam("nodeID"))
+func (req *Messages) Get(ctx context.Contexer) (int, interface{}) {
+	commentType := commenttype.GetEnum(ctx.FindParam("type"))
+	nodeKey, err := husk.ParseKey(ctx.FindParam("nodeID"))
 
 	if err != nil {
-		req.Serve(http.StatusBadRequest, err, nil)
-		return
+		return http.StatusBadRequest, err
 	}
 
 	result, err := core.GetMessage(nodeKey, commentType)
 
 	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
-		return
+		return http.StatusNotFound, err
 	}
 
-	req.Serve(http.StatusOK, nil, result)
+	return http.StatusOK, result
 }
 
 // @Title CreateMessage
@@ -53,23 +50,21 @@ func (req *MessageController) Get() {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [post]
-func (req *MessageController) Post() {
+func (req *Messages) Post(ctx context.Contexer) (int, interface{}) {
 	var entry core.Message
-	err := req.Body(&entry)
+	err := ctx.Body(&entry)
 
 	if err != nil {
-		req.Serve(http.StatusBadRequest, err, nil)
-		return
+		return http.StatusBadRequest, err
 	}
 
 	rec := core.SubmitMessage(entry)
 
 	if rec.Error != nil {
-		req.Serve(http.StatusInternalServerError, rec.Error, nil)
-		return
+		return http.StatusInternalServerError, rec.Error
 	}
 
-	req.Serve(http.StatusOK, nil, rec.Record)
+	return http.StatusOK, rec.Record
 }
 
 // @Title CreateMessage
@@ -78,21 +73,19 @@ func (req *MessageController) Post() {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [put]
-func (req *MessageController) Put() {
+func (req *Messages) Put(ctx context.Contexer) (int, interface{}) {
 	body := core.Message{}
-	key, err := req.GetKeyedRequest(&body)
+	key, err := ctx.GetKeyedRequest(&body)
 
 	if err != nil {
-		req.Serve(http.StatusBadRequest, err, nil)
-		return
+		return http.StatusBadRequest, err
 	}
 
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
-		req.Serve(http.StatusInternalServerError, err, nil)
-		return
+		return http.StatusInternalServerError, err
 	}
 
-	req.Serve(http.StatusOK, nil, "Saved")
+	return http.StatusOK, "Saved"
 }

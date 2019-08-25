@@ -2,16 +2,18 @@ package routers
 
 import (
 	"github.com/louisevanderlith/comment/controllers"
-	"github.com/louisevanderlith/droxolite"
+	"github.com/louisevanderlith/droxolite/mix"
+	"github.com/louisevanderlith/droxolite/resins"
 	"github.com/louisevanderlith/droxolite/roletype"
+	"github.com/louisevanderlith/droxolite/routing"
 )
 
-func Setup(poxy *droxolite.Epoxy) {
+func Setup(poxy resins.Epoxi) {
 	//Message
-	msgCtrl := &controllers.MessageController{}
-	msgGroup := droxolite.NewRouteGroup("message", msgCtrl)
-	msgGroup.AddRoute("Create Message", "/", "POST", roletype.User, msgCtrl.Post)
-	msgGroup.AddRoute("Update Message", "/", "PUT", roletype.User, msgCtrl.Put)
+	msgCtrl := &controllers.Messages{}
+	msgGroup := routing.NewRouteGroup("message", mix.JSON)
+	msgGroup.AddRoute("Create Message", "", "POST", roletype.User, msgCtrl.Post)
+	msgGroup.AddRoute("Update Message", "", "PUT", roletype.User, msgCtrl.Put)
 	msgGroup.AddRoute("All Messges", "/all/{pagesize:[A-Z][0-9]+}", "GET", roletype.Admin, msgCtrl.GetAll)
 	msgGroup.AddRoute("Get Comments for Item", "/{type}/{nodeID:[0-9]+\x60[0-9]+}", "GET", roletype.Unknown, msgCtrl.Get)
 	poxy.AddGroup(msgGroup)
