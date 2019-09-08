@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
-	"github.com/louisevanderlith/comment/core/commenttype"
 	"github.com/louisevanderlith/droxolite/context"
 	"github.com/louisevanderlith/husk"
 )
@@ -12,8 +11,14 @@ import (
 type Messages struct {
 }
 
+func (req *Messages) Get(ctx context.Requester) (int, interface{}) {
+	results := core.GetAllMessages(1, 10)
+
+	return http.StatusOK, results
+}
+
 // @router /all/:pagesize [get]
-func (req *Messages) GetAll(ctx context.Contexer) (int, interface{}) {
+func (req *Messages) Search(ctx context.Requester) (int, interface{}) {
 	page, size := ctx.GetPageData()
 	results := core.GetAllMessages(page, size)
 
@@ -26,16 +31,16 @@ func (req *Messages) GetAll(ctx context.Contexer) (int, interface{}) {
 // @Param	nodeID			path	string 	true		"node's ID"
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
-// @router /:type/:nodeID [get]
-func (req *Messages) Get(ctx context.Contexer) (int, interface{}) {
-	commentType := commenttype.GetEnum(ctx.FindParam("type"))
-	nodeKey, err := husk.ParseKey(ctx.FindParam("nodeID"))
+// @router //:nodeKey?type= [get]
+func (req *Messages) View(ctx context.Requester) (int, interface{}) {
+	//commentType := commenttype.GetEnum(ctx.FindParam("type"))
+	msgKey, err := husk.ParseKey(ctx.FindParam("key"))
 
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
-	result, err := core.GetMessage(nodeKey, commentType)
+	result, err := core.GetMessageByKey(msgKey)
 
 	if err != nil {
 		return http.StatusNotFound, err
@@ -50,7 +55,7 @@ func (req *Messages) Get(ctx context.Contexer) (int, interface{}) {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [post]
-func (req *Messages) Post(ctx context.Contexer) (int, interface{}) {
+func (req *Messages) Create(ctx context.Requester) (int, interface{}) {
 	var entry core.Message
 	err := ctx.Body(&entry)
 
@@ -73,7 +78,7 @@ func (req *Messages) Post(ctx context.Contexer) (int, interface{}) {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [put]
-func (req *Messages) Put(ctx context.Contexer) (int, interface{}) {
+func (req *Messages) Update(ctx context.Requester) (int, interface{}) {
 	body := core.Message{}
 	key, err := ctx.GetKeyedRequest(&body)
 
@@ -88,4 +93,8 @@ func (req *Messages) Put(ctx context.Contexer) (int, interface{}) {
 	}
 
 	return http.StatusOK, "Saved"
+}
+
+func (x *Messages) Delete(ctx context.Requester) (int, interface{}) {
+	return http.StatusMethodNotAllowed, nil
 }

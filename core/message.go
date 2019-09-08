@@ -29,6 +29,10 @@ func SubmitMessage(msg Message) husk.CreateSet {
 	return ctx.Messages.Create(msg)
 }
 
+func GetMessageByKey(key husk.Key) (husk.Recorder, error) {
+	return ctx.Messages.FindByKey(key)
+}
+
 func GetMessage(itemKey husk.Key, commentType commenttype.Enum) (husk.Recorder, error) {
 	return ctx.Messages.FindFirst(byItemKeyCommentType(itemKey, commentType))
 }
