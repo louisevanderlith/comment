@@ -14,6 +14,7 @@ type Message struct {
 	CommentType string
 	Voters      map[husk.Key]struct{}
 	Children    []Message
+	UserImage   string //gravatar id
 }
 
 func (o Message) Valid() (bool, error) {
@@ -54,7 +55,11 @@ func UpdateMessage(key husk.Key, data Message) error {
 		return err
 	}
 
-	defer ctx.Messages.Save()
+	err = ctx.Messages.Update(rec)
 
-	return ctx.Messages.Update(rec)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Messages.Save()
 }
