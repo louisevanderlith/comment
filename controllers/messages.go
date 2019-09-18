@@ -72,15 +72,21 @@ func (req *Messages) Create(ctx context.Requester) (int, interface{}) {
 	return http.StatusOK, rec.Record
 }
 
-// @Title CreateMessage
-// @Description Creates a comment
+// @Title UpdateMessage
+// @Description Updates a comment
 // @Param	body		body 	logic.MessageEntry	true		"comment entry"
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [put]
 func (req *Messages) Update(ctx context.Requester) (int, interface{}) {
+	key, err := husk.ParseKey(ctx.FindParam("key"))
+
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
 	body := core.Message{}
-	key, err := ctx.GetKeyedRequest(&body)
+	err = ctx.Body(&body)
 
 	if err != nil {
 		return http.StatusBadRequest, err
