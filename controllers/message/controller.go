@@ -81,6 +81,7 @@ func Update(c *gin.Context) {
 
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	body := core.Message{}
@@ -88,12 +89,14 @@ func Update(c *gin.Context) {
 
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, "Saved")
