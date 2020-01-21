@@ -1,18 +1,9 @@
 package main
 
 import (
-	"os"
-	"path"
-	"strconv"
-
+	"github.com/gin-gonic/gin"
+	"github.com/louisevanderlith/comment/controllers/message"
 	"github.com/louisevanderlith/comment/core"
-	"github.com/louisevanderlith/comment/routers"
-	"github.com/louisevanderlith/droxolite"
-	"github.com/louisevanderlith/droxolite/bodies"
-	"github.com/louisevanderlith/droxolite/do"
-	"github.com/louisevanderlith/droxolite/element"
-	"github.com/louisevanderlith/droxolite/resins"
-	"github.com/louisevanderlith/droxolite/servicetype"
 )
 
 func main() {
@@ -21,28 +12,14 @@ func main() {
 
 	r := gin.Default()
 
-
-	r.GET("/message/:key", comment.View)
+	r.GET("/message/:key", message.View)
 
 	messages := r.Group("/message")
 	messages.POST("", message.Create)
 	messages.PUT("/:key", message.Update)
-	messages.DELETE("/:key", message.Delete)
 
 	r.GET("/messages", message.Get)
 	r.GET("/messages/:pagesize/*hash", message.Search)
-
-
-	r.GET("/type/:key", message.View)
-
-	types := r.Group("/type")
-	types.POST("", type.Create)
-	types.PUT("/:key", type.Update)
-	types.DELETE("/:key", type.Delete)
-
-	r.GET("/types", type.Get)
-	r.GET("/types/:pagesize/*hash", type.Search)
-	
 
 	err := r.Run(":8084")
 

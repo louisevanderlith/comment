@@ -1,12 +1,11 @@
-package controllers
+package message
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"github.com/louisevanderlith/comment/core"
+	"github.com/louisevanderlith/droxo"
 	"github.com/louisevanderlith/husk"
+	"net/http"
 )
 
 func Get(c *gin.Context) {
@@ -17,7 +16,7 @@ func Get(c *gin.Context) {
 
 // @router /all/:pagesize [get]
 func Search(c *gin.Context) {
-	page, size := getPageData(c.Param("pagesize"))
+	page, size := droxo.GetPageData(c.Param("pagesize"))
 	results := core.GetAllMessages(page, size)
 
 	c.JSON(http.StatusOK, results)
@@ -59,12 +58,14 @@ func Create(c *gin.Context) {
 
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	rec := core.SubmitMessage(entry)
 
 	if rec.Error != nil {
 		c.AbortWithError(http.StatusInternalServerError, rec.Error)
+		return
 	}
 
 	c.JSON(http.StatusOK, rec.Record)
@@ -100,32 +101,4 @@ func Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, "Saved")
-}
-
-func Delete(c *gin.Context) {
-	c.JSON(http.StatusMethodNotAllowed, nil)
-}
-
-func getPageData(pageData string) (int, int) {
-	defaultPage := 1
-	defaultSize := 10
-
-	if len(pageData) < 2 {
-		return defaultPage, defaultSize
-	}
-
-	pChar := []rune(pageData[:1])
-
-	if len(pChar) != 1 {
-		return defaultPage, defaultSize
-	}
-
-	page := int(pChar[0]) % 32
-	pageSize, err := strconv.Atoi(pageData[1:])
-
-	if err != nil {
-		return defaultPage, defaultSize
-	}
-
-	return page, pageSize
 }
