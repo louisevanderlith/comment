@@ -28,3 +28,5 @@ require (
 	golang.org/x/tools v0.0.0-20200121145236-13c74800b9d2 // indirect
 	google.golang.org/genproto v0.0.0-20200117163144-32f20d992d24 // indirect
 )
+
+go 1.13

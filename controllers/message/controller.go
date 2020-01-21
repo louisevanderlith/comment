@@ -2,27 +2,25 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/louisevanderlith/comment/core"
-	"github.com/louisevanderlith/droxolite/context"
 	"github.com/louisevanderlith/husk"
 )
 
-type Messages struct {
-}
-
-func (req *Messages) Get(ctx context.Requester) (int, interface{}) {
+func Get(c *gin.Context) {
 	results := core.GetAllMessages(1, 10)
 
-	return http.StatusOK, results
+	c.JSON(http.StatusOK, results)
 }
 
 // @router /all/:pagesize [get]
-func (req *Messages) Search(ctx context.Requester) (int, interface{}) {
-	page, size := ctx.GetPageData()
+func Search(c *gin.Context) {
+	page, size := getPageData(c.Param("pagesize"))
 	results := core.GetAllMessages(page, size)
 
-	return http.StatusOK, results
+	c.JSON(http.StatusOK, results)
 }
 
 // @Title GetMessages
@@ -32,21 +30,21 @@ func (req *Messages) Search(ctx context.Requester) (int, interface{}) {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router //:nodeKey?type= [get]
-func (req *Messages) View(ctx context.Requester) (int, interface{}) {
+func View(c *gin.Context) {
 	//commentType := commenttype.GetEnum(ctx.FindParam("type"))
-	msgKey, err := husk.ParseKey(ctx.FindParam("key"))
+	msgKey, err := husk.ParseKey(c.Param("key"))
 
 	if err != nil {
-		return http.StatusBadRequest, err
+		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
 	result, err := core.GetMessageByKey(msgKey)
 
 	if err != nil {
-		return http.StatusNotFound, err
+		c.AbortWithError(http.StatusNotFound, err)
 	}
 
-	return http.StatusOK, result
+	c.JSON(http.StatusOK, result)
 }
 
 // @Title CreateMessage
@@ -55,21 +53,21 @@ func (req *Messages) View(ctx context.Requester) (int, interface{}) {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [post]
-func (req *Messages) Create(ctx context.Requester) (int, interface{}) {
+func Create(c *gin.Context) {
 	var entry core.Message
-	err := ctx.Body(&entry)
+	err := c.Bind(&entry)
 
 	if err != nil {
-		return http.StatusBadRequest, err
+		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
 	rec := core.SubmitMessage(entry)
 
 	if rec.Error != nil {
-		return http.StatusInternalServerError, rec.Error
+		c.AbortWithError(http.StatusInternalServerError, rec.Error)
 	}
 
-	return http.StatusOK, rec.Record
+	c.JSON(http.StatusOK, rec.Record)
 }
 
 // @Title UpdateMessage
@@ -78,29 +76,53 @@ func (req *Messages) Create(ctx context.Requester) (int, interface{}) {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [put]
-func (req *Messages) Update(ctx context.Requester) (int, interface{}) {
-	key, err := husk.ParseKey(ctx.FindParam("key"))
+func Update(c *gin.Context) {
+	key, err := husk.ParseKey(c.Param("key"))
 
 	if err != nil {
-		return http.StatusBadRequest, err
+		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
 	body := core.Message{}
-	err = ctx.Body(&body)
+	err = c.Bind(&body)
 
 	if err != nil {
-		return http.StatusBadRequest, err
+		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
-		return http.StatusInternalServerError, err
+		c.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	return http.StatusOK, "Saved"
+	c.JSON(http.StatusOK, "Saved")
 }
 
-func (x *Messages) Delete(ctx context.Requester) (int, interface{}) {
-	return http.StatusMethodNotAllowed, nil
+func Delete(c *gin.Context) {
+	c.JSON(http.StatusMethodNotAllowed, nil)
+}
+
+func getPageData(pageData string) (int, int) {
+	defaultPage := 1
+	defaultSize := 10
+
+	if len(pageData) < 2 {
+		return defaultPage, defaultSize
+	}
+
+	pChar := []rune(pageData[:1])
+
+	if len(pChar) != 1 {
+		return defaultPage, defaultSize
+	}
+
+	page := int(pChar[0]) % 32
+	pageSize, err := strconv.Atoi(pageData[1:])
+
+	if err != nil {
+		return defaultPage, defaultSize
+	}
+
+	return page, pageSize
 }
