@@ -3,48 +3,54 @@ package core_test
 import (
 	"testing"
 
-	comment "github.com/louisevanderlith/comment/core"
+	"github.com/louisevanderlith/comment/core"
+	"github.com/louisevanderlith/comment/core/commenttype"
 )
 
-func TestSubmitMessage_AllEmpty_Invalid(t *testing.T) {
-	msg := comment.Message{}
-	set := comment.SubmitMessage(msg)
+func init() {
+	core.CreateContext()
+}
 
-	if set.Error == nil {
+func TestSubmitMessage_AllEmpty_Invalid(t *testing.T) {
+	msg := core.Message{}
+	err := msg.SubmitMessage()
+
+	if err == nil {
 		t.Error("Expecting validation errors.")
 	}
 }
 
 func TestSubmitMessage_TextEmpty_Invalid(t *testing.T) {
-	msg := comment.Message{}
-	msg.CommentType = comment.Advert
+	msg := core.Message{}
+	msg.CommentType = commenttype.Stock.String()
 
-	set := comment.SubmitMessage(msg)
+	err := msg.SubmitMessage()
 
-	if set.Error == nil {
+	if err == nil {
 		t.Error("Expecting 'Text cant be empty'")
 	}
 }
 
 func TestSubmitMessage_CommentTypeEmpty_Invalid(t *testing.T) {
-	msg := comment.Message{}
+	msg := core.Message{}
 	msg.Text = "Testing some message"
 
-	set := comment.SubmitMessage(msg)
+	err := msg.SubmitMessage()
 
-	if set.Error == nil {
+	if err == nil {
 		t.Error("Expecting 'CommentType cant be empty'")
 	}
 }
 
 func TestSubmitMessage_RequiredOnly_Valid(t *testing.T) {
-	msg := comment.Message{}
-	msg.CommentType = comment.Advert
+	msg := core.Message{}
+	msg.CommentType = commenttype.Stock.String()
 	msg.Text = "Testing some message"
+	msg.UserImage = "jshdkfjha23,mnsdflkjx!"
 
-	set := comment.SubmitMessage(msg)
+	err := msg.SubmitMessage()
 
-	if set.Error != nil {
-		t.Error(set)
+	if err != nil {
+		t.Error(err)
 	}
 }

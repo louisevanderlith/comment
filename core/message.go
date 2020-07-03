@@ -12,34 +12,64 @@ type Message struct {
 	DownVotes   int64  `hsk:"null"`
 	Text        string `hsk:"size(512)"`
 	CommentType string
-	Voters      map[husk.Key]struct{}
+	Voters      []husk.Key
 	Children    []Message
 	UserImage   string //gravatar id
 }
 
-func (o Message) Valid() (bool, error) {
-	return husk.ValidateStruct(&o)
+func (msg Message) Valid() error {
+	return husk.ValidateStruct(&msg)
 }
 
-func SubmitMessage(msg Message) husk.CreateSet {
+func (msg Message) SubmitMessage() error {
 	msg.UpVotes = 0
 	msg.DownVotes = 0
 
-	defer ctx.Messages.Save()
+	set := ctx.Messages.Create(msg)
 
-	return ctx.Messages.Create(msg)
+	if set.Error != nil {
+		return set.Error
+	}
+
+	return ctx.Messages.Save()
 }
 
 func GetMessageByKey(key husk.Key) (husk.Recorder, error) {
 	return ctx.Messages.FindByKey(key)
 }
 
-func GetMessage(itemKey husk.Key, commentType commenttype.Enum) (husk.Recorder, error) {
+func GetNodeMessage(itemKey husk.Key, commentType commenttype.Enum) (husk.Recorder, error) {
 	return ctx.Messages.FindFirst(byItemKeyCommentType(itemKey, commentType))
 }
 
-func GetAllMessages(page, size int) husk.Collection {
+func GetAllMessages(page, size int) (husk.Collection, error) {
 	return ctx.Messages.Find(page, size, husk.Everything())
+}
+
+func SearchMessages(page, size int, param Message) (husk.Collection, error) {
+	return ctx.Messages.Find(page, size, byExpression(param))
+}
+
+func UpdateNodeMessage(itemKey husk.Key, commentType commenttype.Enum, data Message) error {
+	rec, err := ctx.Messages.FindFirst(byItemKeyCommentType(itemKey, commentType))
+
+	if err != nil {
+		return err
+	}
+
+	err = rec.Set(data)
+
+	if err != nil {
+		return err
+	}
+
+	err = ctx.Messages.Update(rec)
+
+	if err != nil {
+		return err
+	}
+
+	return ctx.Messages.Save()
 }
 
 func UpdateMessage(key husk.Key, data Message) error {
