@@ -25,10 +25,10 @@ func (msg Message) SubmitMessage() error {
 	msg.UpVotes = 0
 	msg.DownVotes = 0
 
-	set := ctx.Messages.Create(msg)
+	_, err := ctx.Messages.Create(msg)
 
-	if set.Error != nil {
-		return set.Error
+	if err != nil {
+		return err
 	}
 
 	return ctx.Messages.Save()
