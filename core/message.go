@@ -18,7 +18,7 @@ type Message struct {
 }
 
 func (msg Message) Valid() error {
-	return husk.ValidateStruct(&msg)
+	return husk.ValidateStruct(msg)
 }
 
 func (msg Message) SubmitMessage() error {
