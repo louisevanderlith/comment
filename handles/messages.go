@@ -1,19 +1,17 @@
 package handles
 
 import (
+	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
 	"github.com/louisevanderlith/kong/tokens"
 	"log"
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
-	"github.com/louisevanderlith/droxolite/context"
 	"github.com/louisevanderlith/husk"
 )
 
 func GetMessages(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-
 	results, err := core.GetAllMessages(1, 10)
 
 	if err != nil {
@@ -22,12 +20,15 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(results))
+	err = mix.Write(w, mix.JSON(results))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 func SearchMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-	page, size := ctx.GetPageData()
+	page, size := drx.GetPageData(r)
 	results, err := core.GetAllMessages(page, size)
 
 	if err != nil {
@@ -36,7 +37,11 @@ func SearchMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(results))
+	err = mix.Write(w, mix.JSON(results))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 // @Title GetMessages
@@ -47,8 +52,7 @@ func SearchMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router //:key [get]
 func ViewMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-	msgKey, err := husk.ParseKey(ctx.FindParam("key"))
+	msgKey, err := husk.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)
@@ -64,7 +68,11 @@ func ViewMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(result))
+	err = mix.Write(w, mix.JSON(result))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 // @Title CreateMessage
@@ -74,10 +82,8 @@ func ViewMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router / [post]
 func CreateMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-
 	var entry core.Message
-	err := ctx.Body(&entry)
+	err := drx.JSONBody(r, &entry)
 
 	if err != nil {
 		log.Println(err)
@@ -85,7 +91,7 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tknInfo := ctx.GetTokenInfo()
+	tknInfo := drx.GetIdentity(r)
 
 	if !tknInfo.HasUser() {
 		log.Println(err)
@@ -110,7 +116,11 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON("Comment Created"))
+	err = mix.Write(w, mix.JSON("Comment Created"))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 // @Title UpdateMessage
@@ -120,9 +130,7 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router / [put]
 func UpdateMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-
-	key, err := husk.ParseKey(ctx.FindParam("key"))
+	key, err := husk.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)
@@ -131,7 +139,7 @@ func UpdateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := core.Message{}
-	err = ctx.Body(&body)
+	err = drx.JSONBody(r, &body)
 
 	if err != nil {
 		log.Println(err)
@@ -147,5 +155,9 @@ func UpdateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON("Saved"))
+	err = mix.Write(w, mix.JSON("Saved"))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }

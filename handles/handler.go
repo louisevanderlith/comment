@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func SetupRoutes(scrt, secureUrl string) http.Handler {
+func SetupRoutes(scrt, securityUrl string) http.Handler {
 	/*
 		e.JoinBundle("/", roletype.User, mix.JSON, &handles.Messages{})
 
@@ -20,7 +20,7 @@ func SetupRoutes(scrt, secureUrl string) http.Handler {
 
 	/*"comment.messages.view","comment.messages.create","comment.messages.update","comment.messages.delete"*/
 
-	lst, err := kong.Whitelist(http.DefaultClient, secureUrl, "comment.messages.view", scrt)
+	lst, err := kong.Whitelist(http.DefaultClient, securityUrl, "comment.messages.view", scrt)
 
 	if err != nil {
 		panic(err)

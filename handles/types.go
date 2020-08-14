@@ -1,6 +1,7 @@
 package handles
 
 import (
+	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
 	"github.com/louisevanderlith/kong/tokens"
 	"log"
@@ -8,15 +9,12 @@ import (
 
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/core/commenttype"
-	"github.com/louisevanderlith/droxolite/context"
 	"github.com/louisevanderlith/husk"
 )
 
 func ViewType(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-
-	commentType := commenttype.GetEnum(ctx.FindParam("type"))
-	nodeKey, err := husk.ParseKey(ctx.FindParam("nodeID"))
+	commentType := commenttype.GetEnum(drx.FindParam(r, "type"))
+	nodeKey, err := husk.ParseKey(drx.FindParam(r, "nodeID"))
 
 	if err != nil {
 		log.Println(err)
@@ -32,7 +30,11 @@ func ViewType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(result))
+	err = mix.Write(w, mix.JSON(result))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 // @Title Create Comment
@@ -42,9 +44,8 @@ func ViewType(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router / [post]
 func CreateType(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
 	var entry core.Message
-	err := ctx.Body(&entry)
+	err := drx.JSONBody(r, &entry)
 
 	if err != nil {
 		log.Println(err)
@@ -52,7 +53,7 @@ func CreateType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tknInfo := ctx.GetTokenInfo()
+	tknInfo := drx.GetIdentity(r)
 
 	if !tknInfo.HasUser() {
 		log.Println(err)
@@ -77,13 +78,15 @@ func CreateType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON("Comment Created"))
+	err = mix.Write(w, mix.JSON("Comment Created"))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 func UpdateType(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-
-	key, err := husk.ParseKey(ctx.FindParam("key"))
+	key, err := husk.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)
@@ -92,7 +95,7 @@ func UpdateType(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := core.Message{}
-	err = ctx.Body(&body)
+	err = drx.JSONBody(r, &body)
 
 	if err != nil {
 		log.Println(err)
@@ -108,5 +111,9 @@ func UpdateType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON("Saved"))
+	err = mix.Write(w, mix.JSON("Saved"))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
