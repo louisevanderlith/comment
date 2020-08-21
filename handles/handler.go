@@ -9,6 +9,7 @@ import (
 
 func SetupRoutes(scrt, securityUrl string) http.Handler {
 	/*
+	ins := kong.NewResourceInspector(http.DefaultClient, securityUrl, managerUrl)
 		e.JoinBundle("/", roletype.User, mix.JSON, &handles.Messages{})
 
 		tps := &handles.Types{}
