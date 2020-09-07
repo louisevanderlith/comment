@@ -1,19 +1,19 @@
 package core
 
 import (
+	"github.com/louisevanderlith/husk/hsk"
 	"strings"
 
 	"github.com/louisevanderlith/comment/core/commenttype"
-	"github.com/louisevanderlith/husk"
 )
 
 type messageFilter func(obj Message) bool
 
-func (f messageFilter) Filter(obj husk.Dataer) bool {
-	return f(obj.(Message))
+func (f messageFilter) Filter(obj hsk.Record) bool {
+	return f(obj.Data().(Message))
 }
 
-func byItemKeyCommentType(itemKey husk.Key, commentType commenttype.Enum) messageFilter {
+func byItemKeyCommentType(itemKey hsk.Key, commentType commenttype.Enum) messageFilter {
 	typeStr := commentType.String()
 	return func(obj Message) bool {
 		return obj.ItemKey == itemKey && obj.CommentType == typeStr
@@ -31,7 +31,7 @@ func byExpression(param Message) messageFilter {
 			hasText = strings.Contains(obj.Text, param.Text)
 		}
 
-		if param.UserKey != husk.CrazyKey() {
+		if param.UserKey != nil {
 			hasUser = obj.UserKey == param.UserKey
 		}
 

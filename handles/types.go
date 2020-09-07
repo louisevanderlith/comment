@@ -3,18 +3,18 @@ package handles
 import (
 	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
+	"github.com/louisevanderlith/husk/keys"
 	"github.com/louisevanderlith/kong/tokens"
 	"log"
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/core/commenttype"
-	"github.com/louisevanderlith/husk"
 )
 
 func ViewType(w http.ResponseWriter, r *http.Request) {
 	commentType := commenttype.GetEnum(drx.FindParam(r, "type"))
-	nodeKey, err := husk.ParseKey(drx.FindParam(r, "nodeID"))
+	nodeKey, err := keys.ParseKey(drx.FindParam(r, "nodeID"))
 
 	if err != nil {
 		log.Println(err)
@@ -61,7 +61,7 @@ func CreateType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	k, err := husk.ParseKey(tknInfo.GetClaimString(tokens.UserKey))
+	k, err := keys.ParseKey(tknInfo.GetClaimString(tokens.UserKey))
 
 	if err != nil {
 		log.Println(err)
@@ -86,7 +86,7 @@ func CreateType(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateType(w http.ResponseWriter, r *http.Request) {
-	key, err := husk.ParseKey(drx.FindParam(r, "key"))
+	key, err := keys.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)

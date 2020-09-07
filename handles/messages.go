@@ -3,12 +3,12 @@ package handles
 import (
 	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
+	"github.com/louisevanderlith/husk/keys"
 	"github.com/louisevanderlith/kong/tokens"
 	"log"
 	"net/http"
 
 	"github.com/louisevanderlith/comment/core"
-	"github.com/louisevanderlith/husk"
 )
 
 func GetMessages(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +52,7 @@ func SearchMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router //:key [get]
 func ViewMessage(w http.ResponseWriter, r *http.Request) {
-	msgKey, err := husk.ParseKey(drx.FindParam(r, "key"))
+	msgKey, err := keys.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)
@@ -99,7 +99,7 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	k, err := husk.ParseKey(tknInfo.GetClaimString(tokens.UserKey))
+	k, err := keys.ParseKey(tknInfo.GetClaimString(tokens.UserKey))
 
 	if err != nil {
 		log.Println(err)
@@ -130,7 +130,7 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router / [put]
 func UpdateMessage(w http.ResponseWriter, r *http.Request) {
-	key, err := husk.ParseKey(drx.FindParam(r, "key"))
+	key, err := keys.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)
