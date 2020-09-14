@@ -10,7 +10,7 @@ import (
 type messageFilter func(obj Message) bool
 
 func (f messageFilter) Filter(obj hsk.Record) bool {
-	return f(obj.Data().(Message))
+	return f(obj.GetValue().(Message))
 }
 
 func byItemKeyCommentType(itemKey hsk.Key, commentType commenttype.Enum) messageFilter {
