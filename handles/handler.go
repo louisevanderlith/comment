@@ -2,26 +2,26 @@ package handles
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/louisevanderlith/kong"
+	"github.com/louisevanderlith/kong/middle"
 	"github.com/rs/cors"
 	"net/http"
 )
 
 func SetupRoutes(scrt, securityUrl string) http.Handler {
 	/*
-	ins := kong.NewResourceInspector(http.DefaultClient, securityUrl, managerUrl)
-		e.JoinBundle("/", roletype.User, mix.JSON, &handles.Messages{})
+		ins := middle.NewResourceInspector(http.DefaultClient, securityUrl, managerUrl)
+			e.JoinBundle("/", roletype.User, mix.JSON, &handles.Messages{})
 
-		tps := &handles.Types{}
-		e.JoinPath(e.Router().(*mux.Router), "/{type:[a-zA-Z]+}/{nodeID:[0-9]+\x60[0-9]+}", "View Article for Type", http.MethodGet, roletype.Unknown, mix.JSON, tps.View)
-		e.JoinPath(e.Router().(*mux.Router), "", "Create Message", http.MethodPost, roletype.User, mix.JSON, tps.Create)
+			tps := &handles.Types{}
+			e.JoinPath(e.Router().(*mux.Router), "/{type:[a-zA-Z]+}/{nodeID:[0-9]+\x60[0-9]+}", "View Article for Type", http.MethodGet, roletype.Unknown, mix.JSON, tps.View)
+			e.JoinPath(e.Router().(*mux.Router), "", "Create Message", http.MethodPost, roletype.User, mix.JSON, tps.Create)
 	*/
 
 	r := mux.NewRouter()
 
 	/*"comment.messages.view","comment.messages.create","comment.messages.update","comment.messages.delete"*/
 
-	lst, err := kong.Whitelist(http.DefaultClient, securityUrl, "comment.messages.view", scrt)
+	lst, err := middle.Whitelist(http.DefaultClient, securityUrl, "comment.messages.view", scrt)
 
 	if err != nil {
 		panic(err)
