@@ -21,3 +21,5 @@ db/*.husk
 build
 pubspec.lock
 .packages
+
+cmd/cmd

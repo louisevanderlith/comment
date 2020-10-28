@@ -1,10 +1,10 @@
 package handles
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
 	"github.com/louisevanderlith/husk/keys"
-	"github.com/louisevanderlith/kong/tokens"
 	"log"
 	"net/http"
 
@@ -91,15 +91,10 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tknInfo := drx.GetIdentity(r)
+	token := r.Context().Value("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
 
-	if !tknInfo.HasUser() {
-		log.Println(err)
-		http.Error(w, "", http.StatusBadRequest)
-		return
-	}
-
-	k, err := keys.ParseKey(tknInfo.GetClaimString(tokens.UserKey))
+	k, err := keys.ParseKey(claims["sub"].(string))
 
 	if err != nil {
 		log.Println(err)
