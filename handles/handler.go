@@ -12,6 +12,9 @@ func SetupRoutes(audience, issuer string) http.Handler {
 	mw := open.BearerMiddleware(audience, issuer)
 
 	r := mux.NewRouter()
+
+	r.Handle("/{type:[a-z]+}/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(ViewMessage))).Methods(http.MethodGet)
+
 	r.Handle("/messages", mw.Handler(http.HandlerFunc(GetMessages))).Methods(http.MethodGet)
 	r.Handle("/messages/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(ViewMessage))).Methods(http.MethodGet)
 
@@ -20,15 +23,7 @@ func SetupRoutes(audience, issuer string) http.Handler {
 
 	r.Handle("/messages", mw.Handler(http.HandlerFunc(CreateMessage))).Methods(http.MethodPost)
 
-	r.Handle("/messages", mw.Handler(http.HandlerFunc(UpdateMessage))).Methods(http.MethodPut)
-
-	/*"comment.messages.view","comment.messages.create","comment.messages.update","comment.messages.delete"*/
-
-	//lst, err := middle.Whitelist(http.DefaultClient, securityUrl, "comment.messages.view", scrt)
-
-	//if err != nil {
-	//	panic(err)
-	//}
+	r.Handle("/messages/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(UpdateMessage))).Methods(http.MethodPut)
 
 	corsOpts := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"}, //you service is available and allowed for this base url

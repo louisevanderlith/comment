@@ -14,7 +14,7 @@ import (
 
 func ViewType(w http.ResponseWriter, r *http.Request) {
 	commentType := commenttype.GetEnum(drx.FindParam(r, "type"))
-	nodeKey, err := keys.ParseKey(drx.FindParam(r, "nodeID"))
+	itemKey, err := keys.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
 		log.Println(err)
@@ -22,7 +22,7 @@ func ViewType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := core.GetNodeMessage(nodeKey, commentType)
+	result, err := core.GetNodeMessage(itemKey, commentType)
 
 	if err != nil {
 		log.Println(err)
