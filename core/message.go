@@ -14,7 +14,7 @@ type Message struct {
 	UpVotes     int64  `hsk:"null"`
 	DownVotes   int64  `hsk:"null"`
 	Text        string `hsk:"size(512)"`
-	CommentType string
+	CommentType commenttype.Enum
 	Voters      []hsk.Key
 	Children    []Message
 	UserImage   string //gravatar id

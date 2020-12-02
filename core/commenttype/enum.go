@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-type Enum int
+type Enum = int
 
 const (
 	Profile Enum = iota
@@ -13,24 +13,23 @@ const (
 	Child
 )
 
-var commentTypes = [...]string{
+var vals = [...]string{
 	"Profile",
 	"Stock",
 	"Article",
 	"Child",
 }
 
-func (r Enum) String() string {
-	return commentTypes[r]
+func StringEnum(r Enum) string {
+	return vals[r]
 }
 
 func GetEnum(name string) Enum {
 	var result Enum
 
-	for k, v := range commentTypes {
+	for k, v := range vals {
 		if strings.ToUpper(name) == strings.ToUpper(v) {
-			result = Enum(k)
-			break
+			return k
 		}
 	}
 

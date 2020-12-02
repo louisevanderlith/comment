@@ -4,6 +4,10 @@ import (
 	"github.com/louisevanderlith/husk"
 )
 
+type CommentContext interface {
+
+}
+
 type context struct {
 	Messages husk.Table
 }
