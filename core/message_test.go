@@ -22,7 +22,7 @@ func TestSubmitMessage_AllEmpty_Invalid(t *testing.T) {
 
 func TestSubmitMessage_TextEmpty_Invalid(t *testing.T) {
 	msg := core.Message{}
-	msg.CommentType = commenttype.Stock.String()
+	msg.CommentType = commenttype.Stock
 
 	err := msg.SubmitMessage()
 
@@ -44,7 +44,7 @@ func TestSubmitMessage_CommentTypeEmpty_Invalid(t *testing.T) {
 
 func TestSubmitMessage_RequiredOnly_Valid(t *testing.T) {
 	msg := core.Message{}
-	msg.CommentType = commenttype.Stock.String()
+	msg.CommentType = commenttype.Stock
 	msg.Text = "Testing some message"
 	msg.UserImage = "jshdkfjha23,mnsdflkjx!"
 

@@ -6,6 +6,7 @@ import (
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/core/commenttype"
 	"github.com/louisevanderlith/husk/hsk"
+	"github.com/louisevanderlith/husk/keys"
 	"github.com/louisevanderlith/husk/records"
 	"io/ioutil"
 	"net/http"
@@ -28,7 +29,7 @@ func FetchCommentFor(web *http.Client, host string, ct commenttype.Enum, nodeKey
 		return nil, fmt.Errorf("%v: %s", resp.StatusCode, string(bdy))
 	}
 
-	result := records.NewRecord(&core.Message{})
+	result := records.NewRecord(&core.Message{ItemKey: keys.CrazyKey()})
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(result)
 
