@@ -9,13 +9,13 @@ import (
 )
 
 type Message struct {
-	UserKey     hsk.Key
+	SubjectID   string //oidc user
 	ItemKey     hsk.Key
 	UpVotes     int64  `hsk:"null"`
 	DownVotes   int64  `hsk:"null"`
 	Text        string `hsk:"size(512)"`
 	CommentType commenttype.Enum
-	Voters      []hsk.Key
+	Voters      []string
 	Children    []Message
 	UserImage   string //gravatar id
 }

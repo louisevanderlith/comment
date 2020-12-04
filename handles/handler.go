@@ -13,7 +13,7 @@ func SetupRoutes(audience, issuer string) http.Handler {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/{type:[a-z]+}/{key:[0-9]+\\x60[0-9]+}", ViewMessage).Methods(http.MethodGet)
+	r.HandleFunc("/{type:[a-z]+}/{key:[0-9]+\\x60[0-9]+}", ViewType).Methods(http.MethodGet)
 
 	r.HandleFunc("/messages", GetMessages).Methods(http.MethodGet)
 	r.HandleFunc("/messages/{key:[0-9]+\\x60[0-9]+}", ViewMessage).Methods(http.MethodGet)

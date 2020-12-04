@@ -28,7 +28,7 @@ func FetchCommentFor(web *http.Client, host string, ct commenttype.Enum, nodeKey
 		return nil, fmt.Errorf("%v: %s", resp.StatusCode, string(bdy))
 	}
 
-	result := records.NewRecord(core.Message{})
+	result := records.NewRecord(&core.Message{})
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&result)
 
