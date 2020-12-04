@@ -81,9 +81,7 @@ func UpdateType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := core.Message{
-		ItemKey: keys.CrazyKey(),
-	}
+	body := core.Message{ItemKey: keys.CrazyKey()}
 	err = drx.JSONBody(r, &body)
 
 	if err != nil {

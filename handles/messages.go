@@ -82,9 +82,7 @@ func ViewMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router / [post]
 func CreateMessage(w http.ResponseWriter, r *http.Request) {
-	entry := core.Message{
-		ItemKey: keys.CrazyKey(),
-	}
+	entry := core.Message{ItemKey: keys.CrazyKey()}
 
 	err := drx.JSONBody(r, &entry)
 
@@ -128,9 +126,7 @@ func UpdateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := core.Message{
-		ItemKey: keys.CrazyKey(),
-	}
+	body := core.Message{ItemKey: keys.CrazyKey()}
 	err = drx.JSONBody(r, &body)
 
 	if err != nil {
