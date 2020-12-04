@@ -6,14 +6,13 @@ import (
 	"github.com/louisevanderlith/comment/core"
 	"github.com/louisevanderlith/comment/core/commenttype"
 	"github.com/louisevanderlith/husk/hsk"
-	"github.com/louisevanderlith/husk/keys"
 	"github.com/louisevanderlith/husk/records"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-func FetchCommentFor(web *http.Client, host string, ct commenttype.Enum, nodeKey hsk.Key) (hsk.Record, error) {
+func FetchCommentsFor(web *http.Client, host string, ct commenttype.Enum, nodeKey hsk.Key) (records.Page, error) {
 	typenum := strings.ToLower(commenttype.StringEnum(ct))
 	url := fmt.Sprintf("%s/%s/%s", host, typenum, nodeKey.String())
 	resp, err := web.Get(url)
@@ -29,7 +28,7 @@ func FetchCommentFor(web *http.Client, host string, ct commenttype.Enum, nodeKey
 		return nil, fmt.Errorf("%v: %s", resp.StatusCode, string(bdy))
 	}
 
-	result := records.NewRecord(&core.Message{ItemKey: keys.CrazyKey()})
+	result := records.NewResultPage(core.Message{})
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(result)
 

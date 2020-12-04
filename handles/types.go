@@ -22,7 +22,7 @@ func ViewType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := core.GetNodeMessage(itemKey, commentType)
+	result, err := core.GetNodeMessages(itemKey, commentType)
 
 	if err != nil {
 		log.Println("Get Node Message Error", err)
