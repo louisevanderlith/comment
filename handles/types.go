@@ -17,7 +17,7 @@ func ViewType(w http.ResponseWriter, r *http.Request) {
 	itemKey, err := keys.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Parse Error", err)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -25,7 +25,7 @@ func ViewType(w http.ResponseWriter, r *http.Request) {
 	result, err := core.GetNodeMessage(itemKey, commentType)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Get Node Message Error", err)
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
@@ -48,7 +48,7 @@ func CreateType(w http.ResponseWriter, r *http.Request) {
 	err := drx.JSONBody(r, &entry)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Bind Error", err)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -56,15 +56,7 @@ func CreateType(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 
-	k, err := keys.ParseKey(claims["sub"].(string))
-
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "", http.StatusUnauthorized)
-		return
-	}
-
-	entry.UserKey = k
+	entry.SubjectID = claims["sub"].(string)
 	err = entry.SubmitMessage()
 
 	if err != nil {
@@ -84,16 +76,18 @@ func UpdateType(w http.ResponseWriter, r *http.Request) {
 	key, err := keys.ParseKey(drx.FindParam(r, "key"))
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Parse Error", err)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 
-	body := core.Message{}
+	body := core.Message{
+		ItemKey: keys.CrazyKey(),
+	}
 	err = drx.JSONBody(r, &body)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Bind Error", err)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -101,8 +95,8 @@ func UpdateType(w http.ResponseWriter, r *http.Request) {
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "", http.StatusInternalServerError)
+		log.Println("Updated Message Error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

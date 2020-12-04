@@ -15,7 +15,7 @@ func (f messageFilter) Filter(obj hsk.Record) bool {
 
 func byItemKeyCommentType(itemKey hsk.Key, ct commenttype.Enum) messageFilter {
 	return func(obj Message) bool {
-		return obj.ItemKey == itemKey && obj.CommentType == ct
+		return obj.ItemKey.Compare(itemKey) == 0 && obj.CommentType == ct
 	}
 }
 
@@ -30,8 +30,8 @@ func byExpression(param Message) messageFilter {
 			hasText = strings.Contains(obj.Text, param.Text)
 		}
 
-		if param.UserKey != nil {
-			hasUser = obj.UserKey == param.UserKey
+		if param.SubjectID != "" {
+			hasUser = obj.SubjectID == param.SubjectID
 		}
 
 		if param.CommentType > 0 {

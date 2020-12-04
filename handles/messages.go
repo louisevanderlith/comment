@@ -82,11 +82,14 @@ func ViewMessage(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 body is empty
 // @router / [post]
 func CreateMessage(w http.ResponseWriter, r *http.Request) {
-	var entry core.Message
+	entry := core.Message{
+		ItemKey: keys.CrazyKey(),
+	}
+
 	err := drx.JSONBody(r, &entry)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Bind Error", err)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -94,20 +97,12 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 
-	k, err := keys.ParseKey(claims["sub"].(string))
-
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "", http.StatusUnauthorized)
-		return
-	}
-
-	entry.UserKey = k
+	entry.SubjectID = claims["sub"].(string)
 	err = entry.SubmitMessage()
 
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "", http.StatusBadRequest)
+		log.Println("Submit Error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -133,20 +128,33 @@ func UpdateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := core.Message{}
+	body := core.Message{
+		ItemKey: keys.CrazyKey(),
+	}
 	err = drx.JSONBody(r, &body)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Bind Error", err)
 		http.Error(w, "", http.StatusBadRequest)
+		return
+	}
+
+	token := r.Context().Value("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+
+	subj := claims["sub"].(string)
+
+	if body.SubjectID != subj {
+		log.Println("Wrong user", subj, "for", body.SubjectID)
+		http.Error(w, "", http.StatusUnauthorized)
 		return
 	}
 
 	err = core.UpdateMessage(key, body)
 
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "", http.StatusInternalServerError)
+		log.Println("Update Message Error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
