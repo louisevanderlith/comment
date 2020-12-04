@@ -13,17 +13,19 @@ func SetupRoutes(audience, issuer string) http.Handler {
 
 	r := mux.NewRouter()
 
-	r.Handle("/{type:[a-z]+}/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(ViewMessage))).Methods(http.MethodGet)
+	r.HandleFunc("/{type:[a-z]+}/{key:[0-9]+\\x60[0-9]+}", ViewMessage).Methods(http.MethodGet)
 
-	r.Handle("/messages", mw.Handler(http.HandlerFunc(GetMessages))).Methods(http.MethodGet)
-	r.Handle("/messages/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(ViewMessage))).Methods(http.MethodGet)
+	r.HandleFunc("/messages", GetMessages).Methods(http.MethodGet)
+	r.HandleFunc("/messages/{key:[0-9]+\\x60[0-9]+}", ViewMessage).Methods(http.MethodGet)
 
-	r.Handle("/messages/{pagesize:[A-Z][0-9]+}", mw.Handler(http.HandlerFunc(SearchMessage))).Methods(http.MethodGet)
-	r.Handle("/messages/{pagesize:[A-Z][0-9]+}/{hash:[a-zA-Z0-9]+={0,2}}", mw.Handler(http.HandlerFunc(SearchMessage))).Methods(http.MethodGet)
+	r.HandleFunc("/messages/{pagesize:[A-Z][0-9]+}", SearchMessage).Methods(http.MethodGet)
+	r.HandleFunc("/messages/{pagesize:[A-Z][0-9]+}/{hash:[a-zA-Z0-9]+={0,2}}", SearchMessage).Methods(http.MethodGet)
 
-	r.Handle("/messages", mw.Handler(http.HandlerFunc(CreateMessage))).Methods(http.MethodPost)
+	r.HandleFunc("/messages", CreateMessage).Methods(http.MethodPost)
 
-	r.Handle("/messages/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(UpdateMessage))).Methods(http.MethodPut)
+	r.HandleFunc("/messages/{key:[0-9]+\\x60[0-9]+}", UpdateMessage).Methods(http.MethodPut)
+
+	r.Use(mw.Handler)
 
 	corsOpts := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"}, //you service is available and allowed for this base url

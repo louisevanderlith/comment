@@ -3,7 +3,7 @@ import 'package:mango_ui/keys.dart';
 class Comment {
   final Key itemKey;
   final String text;
-  final String commentType;
+  final num commentType;
   final String userImage;
 
   List<Comment> _children;
